@@ -21,12 +21,11 @@ router.beforeEach((to,from,next)=>{
       return next();
     }
     // 如果用户未登录，则跳转到登录页，读取sessionStorage的值，判断是否登陆
-    const userinfo=sessionStorage.getItem("userInfo");
+    const userinfo=JSON.parse(sessionStorage.getItem("userInfo"));
     if(!userinfo){
      return next('/login');  //return出去代码就不再执行了
     }else{
       next(); //用户已经登录了则放行
-    //  console.log(this)
     }
 }) 
 new Vue({
