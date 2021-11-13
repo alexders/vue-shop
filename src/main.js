@@ -11,9 +11,16 @@ import './assets/fonts/iconfont.css'
 import axios from 'axios'
 // 设置默认的响应路径
 axios.defaults.baseURL='http://www.tangxiaoyang.vip:8888/api/v2/';
+// 配置全局的请求拦截器，加上token
+axios.interceptors.request.use(config=>{
+  // 获取到用户的信息token
+  const userInfo=JSON.parse(sessionStorage.getItem('userInfo'));
+  // 需要判断一下是否用户存在，登录页token可以为空
+  config.headers.Authorization=userInfo ?  userInfo.token : ''
+  return config
+})
 Vue.config.productionTip = false;
 Vue.prototype.$http=axios;
-
 // 配置全局路由守卫
 router.beforeEach((to,from,next)=>{
   // 如果访问的页面是登陆页，则直接放行
