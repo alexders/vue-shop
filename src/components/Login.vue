@@ -72,15 +72,15 @@ export default {
         }
         // 发送登录请求用 await来收正确的反馈
         const { data: res } = await this.$http.post("login", this.loginForm);
-        console.log(res);
+        // console.log(res);
         // 判断数据的状态
         if (res.meta.status !== 200) {
-          this.$message.error("账号或密码错误");
+          return this.$message.error("账号或密码错误");
         } else {
           // 将用户的数据存储起来，存到localStorage中
-          localStorage.setItem("userInfo", JSON.stringify(res.data));
+          sessionStorage.setItem("userInfo", JSON.stringify(res.data));
           this.$message.success("登录成功");
-          // 跳转到Home页main
+          // 跳转到Home页面
           this.$router.push('/home');
         }
       });
