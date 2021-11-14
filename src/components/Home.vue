@@ -12,11 +12,16 @@
       </div>
     </el-header>
     <el-container>
-      <el-aside width="200px">
-        <!-- 左侧菜单界面 -->
+      <el-aside :width="isCollaps ? '64px' :'200px'">
+        <!-- 绑定状态取反点击事件 -->
+        <div class="toggle" @click="isCollaps = !isCollaps">|||</div>
+        <!-- 左侧菜单界面  获取当前路由的路径并保持激活 -->
         <el-menu
         unique-opened
-        router="true"
+        router   
+        :default-active="$route.path"  
+        :collapse="isCollaps"
+        :collapse-transition="false"
         >
           <el-submenu :index="item.id+''" v-for="item in menuList" :key="item.id">
             <template slot="title">
@@ -24,13 +29,16 @@
               <i :class="iconObj[item.id]"></i>
               <span class="authName">{{item.authName}}</span>
             </template>
-            <el-menu-item :index="subItem.path+''" v-for="subItem in item.children" :key="subItem.id">
+            <el-menu-item :index="'/'+subItem.path" v-for="subItem in item.children" :key="subItem.id">
               <i class="el-icon-menu"></i>{{subItem.authName}}</el-menu-item
             >
           </el-submenu>
         </el-menu>
       </el-aside>
-      <el-main>Main</el-main>
+      <!-- 主体内容 -->
+      <el-main>
+        <router-view></router-view>
+      </el-main>
     </el-container>
   </el-container>
 </template>
@@ -44,6 +52,7 @@ export default {
   },
   data() {
     return {
+      isCollaps:false,
       useInfo: null,
       menuList:[],
       // 菜单的图标样式
