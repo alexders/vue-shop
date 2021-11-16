@@ -9,7 +9,7 @@
     <!-- 用户添加搜索栏 -->
     <el-card class="box-card">
       <div style="margin-top: 15px">
-        <el-row>
+        <el-row :gutter="20">
           <el-col :span="8">
             <el-input placeholder="请输入内容" class="input-with-select">
               <el-button
