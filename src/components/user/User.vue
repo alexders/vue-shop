@@ -28,7 +28,27 @@
 </template>
 
 <script>
-export default {};
+export default {
+  data() {
+    return {
+      queryInfo:{
+        query:'',
+        pagenum:1,
+        pagesize:5,
+      }
+    };
+  },
+  methods: {
+    // 发送请求获取用户信息列表
+  async  getUserList() {
+     const {data:res}=await this.$http.get('users',{ params:this.queryInfo })
+      console.log(res);
+    },
+  },
+  created() {
+    this.getUserList();
+  },
+};
 </script>
 
 <style lang="less">
