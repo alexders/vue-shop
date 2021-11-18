@@ -101,7 +101,7 @@ export default {
     if(res.meta.status !== 200){
      return this.$message.error(res.meta.msg)
     }
-    console.log(res.data)
+  //  console.log(res.data)
       return this.menuList=res.data;
     }
   },
