@@ -27,9 +27,12 @@
     </el-card>
     <!-- 添加用户列表 -->
     <el-table :data="userList" >
-      <el-table-column :prop="userList.username" label="日期" width="180"> </el-table-column>
-      <el-table-column prop="name" label="姓名" width="180"> </el-table-column>
-      <el-table-column prop="address" label="地址"> </el-table-column>
+      <el-table-column  type="index" label="序号" width="180"> </el-table-column>
+      <el-table-column prop="id" label="ID" width="180"> </el-table-column>
+      <el-table-column prop="username" label="用户名" width="180"> </el-table-column>
+      <el-table-column prop="mobile" label="手机号" width="180"> </el-table-column>
+      <el-table-column prop="email" label="邮箱" width="180"> </el-table-column>
+      <el-table-column prop="role_name" label="角色名"> </el-table-column>
     </el-table>
   </div>
 </template>
@@ -52,11 +55,12 @@ export default {
       const { data: res } = await this.$http.get("users", {
         params: this.queryInfo,
       });
-      console.log(res);
+      
       if(res.meta.status!=200){
         this.$message.erro('获取用户列表数据异常')
       }
       this.userList=res.data.users;
+      console.log(this.userList);
     },
   },
   created() {
