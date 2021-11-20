@@ -1,6 +1,6 @@
 <template>
-  <!-- 面包屑导航 -->
   <div class="userContainer">
+    <!-- 面包屑导航 -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/welcome' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>用户管理</el-breadcrumb-item>
@@ -24,16 +24,38 @@
           >
         </el-row>
       </div>
+      <!-- 添加用户列表 -->
+      <el-table :data="userList" :stripe="true" :border="true" class="userTable">
+        <el-table-column type="index" label="序号"> </el-table-column>
+        <el-table-column prop="username" label="用户名"> </el-table-column>
+        <el-table-column prop="mobile" label="手机号"> </el-table-column>
+        <el-table-column prop="email" label="邮箱"> </el-table-column>
+        <el-table-column prop="role_name" label="角色名" width="180">
+        </el-table-column>
+        <el-table-column label="状态">
+          <!-- 自定义模板使用作用域插槽 -->
+          <template slot-scope="scope">
+            <el-switch v-model="scope.row.mg_state"> </el-switch>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="180">
+          <el-button type="primary" icon="el-icon-edit" size="mini"></el-button>
+          <el-button
+            type="danger"
+            icon="el-icon-delete"
+            size="mini"
+          ></el-button>
+          <!-- 鼠标移入提示 -->
+          <el-tooltip content="添加角色" placement="top" :enterable="false">
+            <el-button
+              type="warning"
+              icon="el-icon-setting"
+              size="mini"
+            ></el-button>
+          </el-tooltip>
+        </el-table-column>
+      </el-table>
     </el-card>
-    <!-- 添加用户列表 -->
-    <el-table :data="userList" >
-      <el-table-column  type="index" label="序号" width="180"> </el-table-column>
-      <el-table-column prop="id" label="ID" width="180"> </el-table-column>
-      <el-table-column prop="username" label="用户名" width="180"> </el-table-column>
-      <el-table-column prop="mobile" label="手机号" width="180"> </el-table-column>
-      <el-table-column prop="email" label="邮箱" width="180"> </el-table-column>
-      <el-table-column prop="role_name" label="角色名"> </el-table-column>
-    </el-table>
   </div>
 </template>
 
@@ -46,7 +68,7 @@ export default {
         pagenum: 1,
         pagesize: 5,
       },
-      userList:[],
+      userList: [],
     };
   },
   methods: {
@@ -55,11 +77,11 @@ export default {
       const { data: res } = await this.$http.get("users", {
         params: this.queryInfo,
       });
-      
-      if(res.meta.status!=200){
-        this.$message.erro('获取用户列表数据异常')
+
+      if (res.meta.status != 200) {
+        this.$message.erro("获取用户列表数据异常");
       }
-      this.userList=res.data.users;
+      this.userList = res.data.users;
       console.log(this.userList);
     },
   },
