@@ -58,11 +58,11 @@
         <el-pagination
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
-      :current-page="currentPage4"
-      :page-sizes="[100, 200, 300, 400]"
-      :page-size="100"
+      :current-page="queryInfo.pagenum"
+      :page-sizes="[1, 2, 5, 10]"
+      :page-size="queryInfo.pagesize"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="400">
+      :total="total">
     </el-pagination>
     </el-card>
   </div>
@@ -78,6 +78,8 @@ export default {
         pagesize: 5,
       },
       userList: [],
+      // 总数
+      total:0,
     };
   },
   methods: {
@@ -91,8 +93,19 @@ export default {
         this.$message.erro("获取用户列表数据异常");
       }
       this.userList = res.data.users;
+      this.total=res.data.total;
       console.log(this.userList);
     },
+    // 监听页面大小变化的方法
+    handleSizeChange(pageSize){
+      this.queryInfo.pagesize=pageSize;
+      this.getUserList();
+    },
+    // 监听改变当前页的方法
+    handleCurrentChange(currenPage){
+      this.queryInfo.pagenum=currenPage;
+      this.getUserList();
+    }
   },
   created() {
     this.getUserList();
