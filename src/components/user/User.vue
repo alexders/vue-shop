@@ -11,11 +11,12 @@
       <div style="margin-top: 15px">
         <el-row :gutter="20">
           <el-col :span="8">
-            <el-input placeholder="请输入内容" class="input-with-select">
+            <el-input placeholder="请输入用户名" class="input-with-select" v-model="queryInfo.query" clearable  @clear="getUserList" >
               <el-button
                 slot="append"
                 icon="el-icon-search"
-              ></el-button> </el-input
+                @click="getUserList" 
+              ></el-button > </el-input
           ></el-col>
           <el-col :span="4"
             ><el-button type="primary" class="addUser">
@@ -35,7 +36,7 @@
         <el-table-column label="状态">
           <!-- 自定义模板使用作用域插槽 -->
           <template slot-scope="scope">
-            <el-switch v-model="scope.row.mg_state"> </el-switch>
+            <el-switch v-model="scope.row.mg_state" @change="changeState(scope.row)"> </el-switch>
           </template>
         </el-table-column>
         <el-table-column label="操作" width="180">
@@ -83,6 +84,19 @@ export default {
     };
   },
   methods: {
+    //监听用户状态更新
+   async changeState(userinfo){
+      // 发请求更新用户状态
+     const {data:res}= await this.$http.put(`users/${userinfo.id}/state/${userinfo.mg_state}`)
+     if (res.meta.status!=200) {
+        // 将按钮状态重置回去
+        userinfo.mg_state=!userinfo.mg_state;
+        this.$message.error("获取失败")
+     }else{
+       this.$message.success("用户状态更新成功")
+     }
+    }, 
+
     // 发送请求获取用户信息列表
     async getUserList() {
       const { data: res } = await this.$http.get("users", {
@@ -90,7 +104,7 @@ export default {
       });
 
       if (res.meta.status != 200) {
-        this.$message.erro("获取用户列表数据异常");
+        this.$message.error("获取用户列表数据异常");
       }
       this.userList = res.data.users;
       this.total=res.data.total;
