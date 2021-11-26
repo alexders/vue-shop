@@ -91,6 +91,7 @@
         title="添加用户"
         :visible.sync="addDialogVisible"
         width="50%"
+        @close="closeDailog"
         :before-close="handleClose"
       >
         <!-- 填写表单 -->
@@ -117,9 +118,7 @@
         <!-- 底部按钮 -->
         <span slot="footer" class="dialog-footer">
           <el-button @click="addDialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="addDialogVisible = false"
-            >确 定</el-button
-          >
+          <el-button type="primary" @click="addUser">确 定</el-button>
         </span>
       </el-dialog>
     </el-card>
@@ -141,7 +140,12 @@ export default {
       // 弹出框是否展示
       addDialogVisible: false,
       //添加用户的表单
-      userForm: {},
+      userForm: {
+        username: "",
+        password: "",
+        email: "",
+        mobile: "",
+      },
       // 表单的校验
       userRules: {
         username: [
@@ -183,8 +187,11 @@ export default {
     };
   },
   methods: {
-    // 添加用户方法
-
+    // 关闭对对话框方法
+    closeDailog() {
+      this.$refs.ruleForm.resetFields();
+      this.addDialogVisible=false;
+    },
     //监听用户状态更新
     async changeState(userinfo) {
       // 发请求更新用户状态
@@ -222,6 +229,11 @@ export default {
     handleCurrentChange(currenPage) {
       this.queryInfo.pagenum = currenPage;
       this.getUserList();
+    },
+    // 添加用户方法
+    addUser() {
+      // 点击提交校验表单
+      this.$refs.ruleForm.validate();
     },
   },
   created() {
