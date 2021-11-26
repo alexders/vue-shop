@@ -92,7 +92,6 @@
         :visible.sync="addDialogVisible"
         width="50%"
         @close="closeDailog"
-        :before-close="handleClose"
       >
         <!-- 填写表单 -->
         <el-form
@@ -190,7 +189,7 @@ export default {
     // 关闭对对话框方法
     closeDailog() {
       this.$refs.ruleForm.resetFields();
-      this.addDialogVisible=false;
+      this.addDialogVisible = false;
     },
     //监听用户状态更新
     async changeState(userinfo) {
@@ -233,7 +232,22 @@ export default {
     // 添加用户方法
     addUser() {
       // 点击提交校验表单
-      this.$refs.ruleForm.validate();
+      this.$refs.ruleForm.validate(async (valid) => {
+        // 表单不通过校验
+        if (!valid) {
+          return;
+        }
+        const { data: res } = await this.$http.post("users", this.userForm);
+        if (res.meta.status != 201) {
+          this.$message.error("创建失败");
+        } else {
+          this.$message.success("创建成功");
+          // 关闭对话框
+          this.addDialogVisible = false;
+          //  重新刷新表单
+          this.getUserList();
+        }
+      });
     },
   },
   created() {
