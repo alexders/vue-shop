@@ -59,20 +59,28 @@
           </template>
         </el-table-column>
         <el-table-column label="操作" width="180">
-          <el-button type="primary" icon="el-icon-edit" size="mini"></el-button>
-          <el-button
-            type="danger"
-            icon="el-icon-delete"
-            size="mini"
-          ></el-button>
-          <!-- 鼠标移入提示 -->
-          <el-tooltip content="添加角色" placement="top" :enterable="false">
+          <template slot-scope="scope">
             <el-button
-              type="warning"
-              icon="el-icon-setting"
+              type="primary"
+              icon="el-icon-edit"
               size="mini"
+              @click="showUser(scope.row.id)"
             ></el-button>
-          </el-tooltip>
+            <el-button
+              type="danger"
+              icon="el-icon-delete"
+              size="mini"
+              @click="deleteUser(scope.row.id)"
+            ></el-button>
+            <!-- 鼠标移入提示 -->
+            <el-tooltip content="添加角色" placement="top" :enterable="false">
+              <el-button
+                type="warning"
+                icon="el-icon-setting"
+                size="mini"
+              ></el-button>
+            </el-tooltip>
+          </template>
         </el-table-column>
       </el-table>
       <!-- 分页展示 -->
@@ -120,6 +128,37 @@
           <el-button type="primary" @click="addUser">确 定</el-button>
         </span>
       </el-dialog>
+      <!-- 修改用户弹窗 -->
+      <el-dialog
+        title="修改用户"
+        :visible.sync="editDialogVisible"
+        width="50%"
+        @close="closeeditDailog"
+      >
+        <!-- 填写表单 -->
+        <el-form
+          :model="editForm"
+          :rules="editRules"
+          ref="editForm"
+          label-width="100px"
+          class="demo-ruleForm"
+        >
+          <el-form-item label="用户名" prop="username">
+            <el-input v-model="editForm.username" disabled></el-input>
+          </el-form-item>
+          <el-form-item label="邮箱" prop="email">
+            <el-input v-model="editForm.email"></el-input>
+          </el-form-item>
+          <el-form-item label="手机号" prop="mobile">
+            <el-input v-model="editForm.mobile"></el-input>
+          </el-form-item>
+        </el-form>
+        <!-- 底部按钮 -->
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="editDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="editCurrentUser">确 定</el-button>
+        </span>
+      </el-dialog>
     </el-card>
   </div>
 </template>
@@ -138,6 +177,7 @@ export default {
       total: 0,
       // 弹出框是否展示
       addDialogVisible: false,
+      editDialogVisible: false,
       //添加用户的表单
       userForm: {
         username: "",
@@ -183,13 +223,44 @@ export default {
           },
         ],
       },
+      // 修改表单
+      editForm: {
+        username: "",
+        email: "",
+        mobile: "",
+      },
+      // 修改表单的校验规则
+      editRules: {
+        email: [
+          { required: true, message: "请输入邮箱", trigger: "blur" },
+          {
+            pattern: /\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/,
+            message: "邮箱格式不正确",
+            trigger: "blur",
+          },
+        ],
+        mobile: [
+          { required: true, message: "请输入手机号", trigger: "blur" },
+          {
+            pattern:
+              /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/,
+            message: "手机号格式不正确",
+            trigger: "blur",
+          },
+        ],
+      },
     };
   },
   methods: {
-    // 关闭对对话框方法
+    // 关闭对话框方法
     closeDailog() {
       this.$refs.ruleForm.resetFields();
       this.addDialogVisible = false;
+    },
+    // 关闭编辑框的方法
+    closeeditDailog() {
+      this.$refs.editForm.resetFields();
+      this.editDialogVisible = false;
     },
     //监听用户状态更新
     async changeState(userinfo) {
@@ -248,6 +319,58 @@ export default {
           this.getUserList();
         }
       });
+    },
+    // 修改用户的方法
+    async showUser(id) {
+      this.editDialogVisible = true;
+      // 展示选中行的用户信息
+      const { data: res } = await this.$http.get(`users/${id}`);
+      if (res.meta.status != 200) {
+        this.$message.error("获取用户失败");
+      }
+      this.editForm = res.data;
+    },
+    // 修改当前用户方法
+    editCurrentUser() {
+      // 校验当前表单
+      this.$refs.editForm.validate(async (valid) => {
+        if (!valid) {
+          return this.$message.error("请填写完整信息");
+        }
+        const { data: res } = await this.$http.put(
+          `users/${this.editForm.id}`,
+          {
+            email: this.editForm.email,
+            mobile: this.editForm.mobile,
+          }
+        );
+        if (res.meta.status != 200) {
+          this.$message.error("修改用户失败");
+        }
+        this.getUserList();
+        this.$message.success("修改用户成功");
+        this.editDialogVisible = false;
+      });
+    },
+    // 删除用户的方法
+    deleteUser(id) {
+      this.$confirm("此操作将永久删除该用户, 是否继续?", "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(async () => {
+          // 调用接口删除用户
+          const { data: res } = await this.$http.delete(`users/${id}`);
+          if (res.meta.status != 200) {
+            this.$message.error("删除用户失败");
+          }
+          this.$message.success("已删除用户");
+          this.getUserList();
+        })
+        .catch(() => {
+          this.$message.info("已取消删除");
+        });
     },
   },
   created() {
