@@ -103,13 +103,13 @@
         <p>
           分配的新角色：
           <el-select v-model="selec_role" placeholder="请选择">
-            <el-option v-for="item in role" :key="item.id" :label="item.roleName" :value="item.id"> </el-option>
+            <el-option v-for="item in role" :key="item.id" :label="item.roleName" :value="item.id" > </el-option>
           </el-select>
         </p>
 
         <span slot="footer" class="dialog-footer">
           <el-button @click="addRoleDialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="addRole">确 定</el-button>
+          <el-button type="primary" @click="addRole()">确 定</el-button>
         </span>
       </el-dialog>
     </el-card>
@@ -333,6 +333,7 @@ export default {
     async showRole(user) {
       this.addRoleDialogVisible = true;
       this.userRole = user;
+      console.log(this.userRole.id)
       // 获取角色信息
       const { data: res } = await this.$http.get("roles");
       if (res.meta.status != 200) {
@@ -343,11 +344,13 @@ export default {
     // 添加角色
     async addRole() {
       // 将选择的角色发送给服务器
-      const { data: res } = await this.$http.put(`users/${this.userRole.id}/role`, { rid: this.selec_role.rid });
+      const { data: res } = await this.$http.put(`users/${this.userRole.id}/role`, { rid: this.selec_role });
+      console.log(this.userRole.id,this.selec_role.rid)
       console.log(res);
       if (res.meta.status != 200) {
-        return this.$message.error("设置角色失败");
+        return this.$message.error("设置角色失败："+res.meta.msg);
       }
+      this.$message.success("成功修改角色");
       this.getUserList();
       this.addRoleDialogVisible = false;
     },
