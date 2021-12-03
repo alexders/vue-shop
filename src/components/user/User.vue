@@ -333,7 +333,6 @@ export default {
     async showRole(user) {
       this.addRoleDialogVisible = true;
       this.userRole = user;
-      console.log(this.userRole.id)
       // 获取角色信息
       const { data: res } = await this.$http.get("roles");
       if (res.meta.status != 200) {
@@ -345,8 +344,6 @@ export default {
     async addRole() {
       // 将选择的角色发送给服务器
       const { data: res } = await this.$http.put(`users/${this.userRole.id}/role`, { rid: this.selec_role });
-      console.log(this.userRole.id,this.selec_role.rid)
-      console.log(res);
       if (res.meta.status != 200) {
         return this.$message.error("设置角色失败："+res.meta.msg);
       }
