@@ -38,6 +38,26 @@ const routes = [
         path:'/roles',
         name:'roles',
         component:()=>import('@/components/roles/Roles.vue')
+      },
+      {
+        path:'/goods',
+        name:'goods',
+        component:()=>import('@/components/goods/Goods.vue')
+      },
+      {
+        path:'/params',
+        name:'params',
+        component:()=>import('@/components/params/Params.vue')
+      },
+      {
+        path:'/categories',
+        name:'categories',
+        component:()=>import('@/components/categories/Categories.vue')
+      },
+      {
+        path:'/orders',
+        name:'orders',
+        component:()=>import('@/components/orders/Orders.vue')
       }
     ]
   }
