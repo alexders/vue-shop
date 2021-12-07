@@ -9,7 +9,7 @@
     <!-- 权限表单 -->
     <el-card class="box-card">
       <el-table :data="rightData" :stripe="true" :border="true">
-        <el-table-column type="index" label="序号"> </el-table-column>
+        <el-table-column type="index" label="序号" width="50">  </el-table-column>
         <el-table-column prop="authName" label="权限名称"> </el-table-column>
         <el-table-column prop="path" label="路径"> </el-table-column>
         <el-table-column label="权限等级">
