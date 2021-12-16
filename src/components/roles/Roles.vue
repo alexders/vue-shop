@@ -11,10 +11,17 @@
       <el-button type="primary" class="roleBtn">添加角色</el-button>
       <!-- 列表 -->
       <el-table :data="roleList" :stripe="true" :border="true">
-        <el-table-column label="明细" width="50" type="expand"> 
+        <el-table-column label="明细" width="50" type="expand">
+          <!-- 明细菜单 -->
+          <template slot-scope="scoped">
+            <el-row v-for="item in scoped.row.children" :key="item.id">
+              <el-col :span="5"> <el-tag type="primary">{{item.authName}}</el-tag></el-col> 
+              <el-col :span="19"> </el-col> 
+            </el-row>
+          </template>
         </el-table-column>
-        <el-table-column type="index" label="序号" width="50" > </el-table-column>
-        <el-table-column prop="roleName" label="角色名称" > </el-table-column>
+        <el-table-column type="index" label="序号" width="50"> </el-table-column>
+        <el-table-column prop="roleName" label="角色名称"> </el-table-column>
         <el-table-column prop="roleDesc" label="角色描述"> </el-table-column>
         <el-table-column label="操作">
           <!-- 操作按钮 -->
@@ -48,6 +55,7 @@ export default {
         return this.$message.error(res.meta.msg);
       }
       this.roleList = res.data;
+      console.log(res.data);
     },
   },
   created() {
