@@ -14,9 +14,15 @@
         <el-table-column label="明细" width="50" type="expand">
           <!-- 明细菜单 -->
           <template slot-scope="scoped">
+            <!-- 一级权限渲染 -->
             <el-row v-for="item in scoped.row.children" :key="item.id">
-              <el-col :span="5"> <el-tag type="primary">{{item.authName}}</el-tag></el-col> 
-              <el-col :span="19"> </el-col> 
+              <el-col :span="5"> <el-tag type="primary" closable>{{item.authName}}</el-tag></el-col> 
+              <el-col :span="19"> 
+
+
+                <el-col :span="6"><el-tag type="sucess">{{item.children.authName}}</el-tag></el-col>  
+                <!-- <el-col :span="18"><el-tag type="waring">{{item.children.children.authName}}</el-tag></el-col>   -->
+              </el-col> 
             </el-row>
           </template>
         </el-table-column>
