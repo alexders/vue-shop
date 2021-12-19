@@ -11,18 +11,28 @@
       <el-button type="primary" class="roleBtn">添加角色</el-button>
       <!-- 列表 -->
       <el-table :data="roleList" :stripe="true" :border="true">
-        <el-table-column label="明细" width="50" type="expand">
+        <el-table-column label="明细" type="expand">
           <!-- 明细菜单 -->
           <template slot-scope="scoped">
             <!-- 一级权限渲染 -->
-            <el-row v-for="item in scoped.row.children" :key="item.id">
-              <el-col :span="5"> <el-tag type="primary" closable>{{item.authName}}</el-tag></el-col> 
-              <el-col :span="19"> 
-
-
-                <el-col :span="6"><el-tag type="sucess">{{item.children.authName}}</el-tag></el-col>  
-                <!-- <el-col :span="18"><el-tag type="waring">{{item.children.children.authName}}</el-tag></el-col>   -->
-              </el-col> 
+            <el-row v-for="item1 in scoped.row.children" :key="item1.id" class="rolerRights">
+              <el-col :span="5">
+                <el-tag type="primary" closable>{{ item1.authName }}</el-tag>
+                <i class="el-icon-caret-right"></i>
+              </el-col>
+              <el-col :span="19">
+                <!-- 渲染二级权限 -->
+                <el-row v-for="item2 in item1.children" :key="item2.id">
+                  <el-col :span="6">
+                    <el-tag closable type="success">{{ item2.authName }}</el-tag>
+                    <i class="el-icon-caret-right"></i>
+                  </el-col>
+                  <!-- 渲染三级权限 -->
+                  <el-col :span="18">
+                    <el-tag closable type="warning" v-for="item3 in item2.children" :key="item3.id">{{ item3.authName }}</el-tag>
+                  </el-col>
+                </el-row>
+              </el-col>
             </el-row>
           </template>
         </el-table-column>
