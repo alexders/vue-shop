@@ -15,14 +15,14 @@
           <!-- 明细菜单 -->
           <template slot-scope="scoped">
             <!-- 一级权限渲染 -->
-            <el-row v-for="item1 in scoped.row.children" :key="item1.id" class="rolerRights">
+            <el-row v-for="(item1,i) in scoped.row.children" :key="item1.id" class="rolerRights" :class="{bdbottom:true,bdtop:i==0}">
               <el-col :span="5">
                 <el-tag type="primary" closable>{{ item1.authName }}</el-tag>
                 <i class="el-icon-caret-right"></i>
               </el-col>
               <el-col :span="19">
                 <!-- 渲染二级权限 -->
-                <el-row v-for="item2 in item1.children" :key="item2.id">
+                <el-row v-for="(item2,i2) in item1.children" :key="item2.id"  :class="{bdtop:true,bdtop:i2!==0}">
                   <el-col :span="6">
                     <el-tag closable type="success">{{ item2.authName }}</el-tag>
                     <i class="el-icon-caret-right"></i>
