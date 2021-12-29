@@ -8,21 +8,21 @@
     </el-breadcrumb>
     <!--  -->
     <el-card class="roleCard">
-      <el-button type="primary" class="roleBtn">添加角色</el-button>
+      <el-button type="primary" class="roleBtn" @click="addDialogVisible">添加角色</el-button>
       <!-- 列表 -->
       <el-table :data="roleList" :stripe="true" :border="true">
         <el-table-column label="明细" type="expand">
           <!-- 明细菜单 -->
           <template slot-scope="scoped">
             <!-- 一级权限渲染 -->
-            <el-row v-for="(item1,i) in scoped.row.children" :key="item1.id" class="rolerRights" :class="{bdbottom:true,bdtop:i==0}">
+            <el-row v-for="(item1, i) in scoped.row.children" :key="item1.id" class="rolerRights" :class="{ bdbottom: true, bdtop: i == 0 }">
               <el-col :span="5">
                 <el-tag type="primary" closable>{{ item1.authName }}</el-tag>
                 <i class="el-icon-caret-right"></i>
               </el-col>
               <el-col :span="19">
                 <!-- 渲染二级权限 -->
-                <el-row v-for="(item2,i2) in item1.children" :key="item2.id"  :class="{bdtop:true,bdtop:i2!==0}">
+                <el-row v-for="(item2, i2) in item1.children" :key="item2.id" :class="{ bdtop: true, bdtop: i2 !== 0 }">
                   <el-col :span="6">
                     <el-tag closable type="success">{{ item2.authName }}</el-tag>
                     <i class="el-icon-caret-right"></i>
@@ -51,6 +51,21 @@
           </template>
         </el-table-column>
       </el-table>
+      <!--添加角色弹窗-->
+      <el-dialog title="添加角色" :visible.sync="dialogFormVisible" width="50%" @close="closeDailog">
+        <el-form :model="roleForm" :rules="roleFormRules" ref="roleRef" label-width="100px">
+          <el-form-item label="角色名称" prop="roleName">
+            <el-input v-model="roleForm.roleName" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="角色描述" prop="roleDesc">
+            <el-input v-model="roleForm.roleDesc" autocomplete="off"></el-input>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="dialogFormVisible = false">取 消</el-button>
+          <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+        </div>
+      </el-dialog>
     </el-card>
   </div>
 </template>
@@ -60,6 +75,28 @@ export default {
   data() {
     return {
       roleList: {},
+      dialogFormVisible: false,
+      roleForm: { roleName: "", roleDesc: "" },
+      roleFormRules: {
+        roleName: [
+          { required: true, message: "请输入角色名", trigger: "blur" },
+          {
+            min:2,
+            max: 10,
+            message: "长度在 2 到 10 个字符",
+            trigger: "blur",
+          },
+        ],
+        roleDesc: [
+          { required: true, message: "请输入角色描述", trigger: "blur" },
+          {
+            min: 3,
+            max: 10,
+            message: "长度在 3 到 10 个字符",
+            trigger: "blur",
+          },
+        ],
+      },
     };
   },
   methods: {
@@ -73,6 +110,15 @@ export default {
       this.roleList = res.data;
       console.log(res.data);
     },
+    // 添加角色菜单
+    addDialogVisible() {
+      this.dialogFormVisible = true;
+    },
+    // 关闭对话框
+    closeDailog(){
+      this.$refs.roleRef.resetFields();
+      this.dialogFormVisible=false;
+    }
   },
   created() {
     this.getRoleList();
