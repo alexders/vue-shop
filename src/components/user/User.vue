@@ -280,7 +280,7 @@ export default {
         }
       });
     },
-    // 修改用户的方法
+    // 展示用户的方法
     async showUser(id) {
       this.editDialogVisible = true;
       // 展示选中行的用户信息
@@ -289,14 +289,17 @@ export default {
         this.$message.error("获取用户失败");
       }
       this.editForm = res.data;
+      
     },
     // 修改当前用户方法
     editCurrentUser() {
+         console.log(this.editForm);
       // 校验当前表单
       this.$refs.editForm.validate(async (valid) => {
         if (!valid) {
           return this.$message.error("请填写完整信息");
         }
+     
         const { data: res } = await this.$http.put(`users/${this.editForm.id}`, {
           email: this.editForm.email,
           mobile: this.editForm.mobile,
