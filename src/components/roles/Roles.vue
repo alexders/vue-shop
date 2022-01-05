@@ -63,7 +63,7 @@
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click="dialogFormVisible = false">取 消</el-button>
-          <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+          <el-button type="primary" @click="addRole">确 定</el-button>
         </div>
       </el-dialog>
     </el-card>
@@ -81,7 +81,7 @@ export default {
         roleName: [
           { required: true, message: "请输入角色名", trigger: "blur" },
           {
-            min:2,
+            min: 2,
             max: 10,
             message: "长度在 2 到 10 个字符",
             trigger: "blur",
@@ -100,11 +100,26 @@ export default {
     };
   },
   methods: {
+    // 添加角色
+     addRole() {
+      this.$refs.roleRef.validate( async (validate) => {
+        if (!validate) {
+          return;
+        }
+        const { data: res } = await this.$http.post("roles", this.roleForm);
+        if (res.meta.status != 201) {
+          return this.$message.error("创建失败：" + res.meta.msg);
+        }
+        this.dialogFormVisible = false;
+        this.getRoleList();
+        this.$message.success("创建成功");
+      });
+    },
     // 获取到角色列表
     async getRoleList() {
       const { data: res } = await this.$http.get("roles");
       // console.log(res)
-      if (res.meta.status !== 200) {
+      if (res.meta.status != 200) {
         return this.$message.error(res.meta.msg);
       }
       this.roleList = res.data;
@@ -115,10 +130,10 @@ export default {
       this.dialogFormVisible = true;
     },
     // 关闭对话框
-    closeDailog(){
+    closeDailog() {
       this.$refs.roleRef.resetFields();
-      this.dialogFormVisible=false;
-    }
+      this.dialogFormVisible = false;
+    },
   },
   created() {
     this.getRoleList();
