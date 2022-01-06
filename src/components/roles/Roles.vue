@@ -43,7 +43,7 @@
           <!-- 操作按钮 -->
           <template slot-scope="scope">
             <el-button type="primary" icon="el-icon-edit" size="mini" @click="showRole(scope.row.id)">编辑</el-button>
-            <el-button type="danger" icon="el-icon-delete" size="mini">删除</el-button>
+            <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteRole(scope.row.id)">删除</el-button>
             <!-- 鼠标移入提示 -->
             <el-tooltip content="分配角色权限" placement="top" :enterable="false">
               <el-button type="warning" icon="el-icon-setting" size="mini" @click="showRole(scope.row)">分配权限</el-button>
@@ -137,6 +137,24 @@ export default {
     };
   },
   methods: {
+    //删除角色
+    deleteRole(id){
+      this.$confirm("此操作将删除该角色，是否接续?","警告",{
+        confirmButtonText:"确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(async()=>{
+        // 调用删除角色接口
+       const {data:res}=await this.$http.delete(`roles/${id}`);
+       if (res.meta.status !=200) {
+         return this.$message.error("删除角色失败")
+       }
+       this.$message.success("已删除角色");
+       this.getRoleList();
+      }).catch(()=>{
+        this.$message.info("已取消")
+      });
+    },
     // 添加角色
     addRole() {
       this.$refs.roleRef.validate(async (validate) => {
