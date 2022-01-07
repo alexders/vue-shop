@@ -139,7 +139,7 @@ export default {
   methods: {
     //删除角色
     deleteRole(id){
-      this.$confirm("此操作将删除该角色，是否接续?","警告",{
+      this.$confirm("此操作将删除该角色，是否继续?","警告",{
         confirmButtonText:"确定",
         cancelButtonText: "取消",
         type: "warning",
