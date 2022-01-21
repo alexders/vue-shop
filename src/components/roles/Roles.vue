@@ -46,7 +46,7 @@
             <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteRole(scope.row.id)">删除</el-button>
             <!-- 鼠标移入提示 -->
             <el-tooltip content="分配角色权限" placement="top" :enterable="false">
-              <el-button type="warning" icon="el-icon-setting" size="mini" @click="showRole(scope.row)">分配权限</el-button>
+              <el-button type="warning" icon="el-icon-setting" size="mini" @click="assignRoles(scope.row)">分配权限</el-button>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -67,7 +67,7 @@
         </div>
       </el-dialog>
       <!-- 修改角色弹窗 -->
-      <el-dialog title="修改角色" :visible.sync="eidtRoledialogFormVisible" width="50%" @close="closeEditeDailog">
+      <el-dialog title="修改角色" :visible.sync="eidtRoledialogFormVisible" width="50%" @close="eidtRoledialogFormVisible=false">
         <el-form :model="editRoleForm" :rules="editerules" ref="eidteRoleForm" label-width="100px" class="demo-edit-roleForm">
           <el-form-item label="角色名称" prop="roleName">
             <el-input v-model="editRoleForm.roleName"></el-input>
@@ -81,6 +81,8 @@
           <el-button type="primary" @click="editRole">确 定</el-button>
         </div>
       </el-dialog>
+      <!-- 分配角色的弹窗 -->
+      <el-dialog title="分配角色" :visible="assignRolesVisible" width="50%" @close="assignRolesVisible=false"></el-dialog>
     </el-card>
   </div>
 </template>
@@ -134,9 +136,15 @@ export default {
           },
         ],
       },
+      assignRolesVisible:false,//分配角色弹窗
     };
   },
   methods: {
+    // 分配角色
+    assignRoles(){
+      this.assignRolesVisible=true;
+    },
+    
     //删除角色
     deleteRole(id){
       this.$confirm("此操作将删除该角色，是否继续?","警告",{
