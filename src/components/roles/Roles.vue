@@ -17,19 +17,19 @@
             <!-- 一级权限渲染 -->
             <el-row v-for="(item1, i) in scoped.row.children" :key="item1.id" class="rolerRights" :class="{ bdbottom: true, bdtop: i == 0 }">
               <el-col :span="5">
-                <el-tag type="primary" closable  @close="handleClose(scoped.row,item1.id)">{{ item1.authName }}</el-tag>
+                <el-tag type="primary" closable @close="handleClose(scoped.row, item1.id)">{{ item1.authName }}</el-tag>
                 <i class="el-icon-caret-right"></i>
               </el-col>
               <el-col :span="19">
                 <!-- 渲染二级权限 -->
                 <el-row v-for="(item2, i2) in item1.children" :key="item2.id" :class="{ bdtop: true, bdtop: i2 !== 0 }">
                   <el-col :span="6">
-                    <el-tag closable  @close="handleClose(scoped.row,item2.id)" type="success">{{ item2.authName }}</el-tag>
+                    <el-tag closable @close="handleClose(scoped.row, item2.id)" type="success">{{ item2.authName }}</el-tag>
                     <i class="el-icon-caret-right"></i>
                   </el-col>
                   <!-- 渲染三级权限 -->
                   <el-col :span="18">
-                    <el-tag closable type="warning" v-for="item3 in item2.children" :key="item3.id" @close="handleClose(scoped.row,item3.id)">{{ item3.authName }}</el-tag>
+                    <el-tag closable type="warning" v-for="item3 in item2.children" :key="item3.id" @close="handleClose(scoped.row, item3.id)">{{ item3.authName }}</el-tag>
                   </el-col>
                 </el-row>
               </el-col>
@@ -67,7 +67,7 @@
         </div>
       </el-dialog>
       <!-- 修改角色弹窗 -->
-      <el-dialog title="修改角色" :visible.sync="eidtRoledialogFormVisible" width="50%" @close="eidtRoledialogFormVisible=false">
+      <el-dialog title="修改角色" :visible.sync="eidtRoledialogFormVisible" width="50%" @close="eidtRoledialogFormVisible = false">
         <el-form :model="editRoleForm" :rules="editerules" ref="eidteRoleForm" label-width="100px" class="demo-edit-roleForm">
           <el-form-item label="角色名称" prop="roleName">
             <el-input v-model="editRoleForm.roleName"></el-input>
@@ -82,7 +82,14 @@
         </div>
       </el-dialog>
       <!-- 分配角色的弹窗 -->
-      <el-dialog title="分配角色" :visible="assignRolesVisible" width="50%" @close="assignRolesVisible=false"></el-dialog>
+      <el-dialog title="分配角色" :visible="assignRolesVisible" width="50%" @close="closeRoleDailog">
+        <el-tree ref="treeRef" :data="rightsList" :props="rightsProps" node-key="id" show-checkbox default-expand-all :default-checked-keys="defaultKey"></el-tree>
+
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="assignRolesVisible = false">取 消</el-button>
+          <el-button type="primary" @click="assignRights">确 定</el-button>
+        </div>
+      </el-dialog>
     </el-card>
   </div>
 </template>
@@ -136,32 +143,73 @@ export default {
           },
         ],
       },
-      assignRolesVisible:false,//分配角色弹窗
+      assignRolesVisible: false, //分配角色弹窗
+      rightsList: [],
+      // 树形配置对象
+      rightsProps: {
+        label: "authName",
+        children: "children",
+      },
+      defaultKey: [], //默认选中的key
+      roleId:'',
     };
   },
   methods: {
-    // 分配角色
-    assignRoles(){
-      this.assignRolesVisible=true;
+    // 分配权限
+   async assignRights(){
+    const keys=  this.$refs.treeRef.getCheckedKeys().concat(this.$refs.treeRef.getHalfCheckedKeys());
+    const idStr=keys.join(',')
+    const {data :res }=await this.$http.post(`roles/${this.roleId}/rights`,{
+      rids:idStr,
+    })
+     if (res.meta.status != 200) {
+       return this.$message.error("角色权限分配失败");
+     }
+     this.getRoleList();
+     this.assignRolesVisible=false;
+     this.$message.success("角色分配权限成功");
     },
-    
+    // 分配权限弹窗
+    async assignRoles(role) {
+      // 获取树形权限数据
+      const { data: res } = await this.$http.get("rights/tree");
+      if (res.meta.status != 200) {
+        return this.$message.error("获取权限列表失败");
+      }
+      this.rightsList = res.data;
+      this.getdefaultKey(role);
+      this.roleId=role.id;
+      this.assignRolesVisible = true;
+    },
+    // 获取默认选中的权限key
+    getdefaultKey(role){
+      if (!role.children) {
+        return  this.defaultKey.push(role.id)//defaultKey是数组需要push
+      }
+        // 继续遍历
+        role.children.forEach(item => {
+          this.getdefaultKey(item);
+        });
+    },
     //删除角色
-    deleteRole(id){
-      this.$confirm("此操作将删除该角色，是否继续?","警告",{
-        confirmButtonText:"确定",
+    deleteRole(id) {
+      this.$confirm("此操作将删除该角色，是否继续?", "警告", {
+        confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
-      }).then(async()=>{
-        // 调用删除角色接口
-       const {data:res}=await this.$http.delete(`roles/${id}`);
-       if (res.meta.status !=200) {
-         return this.$message.error("删除角色失败")
-       }
-       this.$message.success("已删除角色");
-       this.getRoleList();
-      }).catch(()=>{
-        this.$message.info("已取消")
-      });
+      })
+        .then(async () => {
+          // 调用删除角色接口
+          const { data: res } = await this.$http.delete(`roles/${id}`);
+          if (res.meta.status != 200) {
+            return this.$message.error("删除角色失败");
+          }
+          this.$message.success("已删除角色");
+          this.getRoleList();
+        })
+        .catch(() => {
+          this.$message.info("已取消");
+        });
     },
     // 添加角色
     addRole() {
@@ -180,20 +228,20 @@ export default {
     },
     // 修改角色
     editRole() {
-      this.$refs.eidteRoleForm.validate(async(valid) => {
+      this.$refs.eidteRoleForm.validate(async (valid) => {
         if (!valid) {
           return this.$message.error("请填写完整信息");
         }
-        const { data: res } = await this.$http.put(`roles/${this.editRoleForm.roleId}`,{
-          roleName:this.editRoleForm.roleName,
-          roleDesc:this.editRoleForm.roleDesc,
+        const { data: res } = await this.$http.put(`roles/${this.editRoleForm.roleId}`, {
+          roleName: this.editRoleForm.roleName,
+          roleDesc: this.editRoleForm.roleDesc,
         });
-        console.log(res.data)
+        console.log(res.data);
         if (res.meta.status != 200) {
           this.$message.error("更新当前角色信息失败");
         }
         this.$message.success("用户更新角色成功");
-        this.eidtRoledialogFormVisible=false;
+        this.eidtRoledialogFormVisible = false;
         this.getRoleList();
       });
     },
@@ -216,7 +264,7 @@ export default {
       this.eidtRoledialogFormVisible = true;
       const { data: res } = await this.$http.get(`roles/${id}`);
       if (res.meta.status != 200) {
-       return  this.$message.error("获取当前角色信息失败");
+        return this.$message.error("获取当前角色信息失败");
       }
       console.log(res.data);
       this.editRoleForm = res.data;
@@ -227,27 +275,34 @@ export default {
       this.dialogFormVisible = false;
     },
     //删除权限标签
-    handleClose(role,rightId){
-      this.$confirm('是否删除该权限?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(async () => {
+    handleClose(role, rightId) {
+      this.$confirm("是否删除该权限?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(async () => {
           // 发请求
-          const {data:res}=await this.$http.delete(`roles/${role.id}/rights/${rightId}`);
+          const { data: res } = await this.$http.delete(`roles/${role.id}/rights/${rightId}`);
           if (res.meta.status != 200) {
-           return this.$message.error("删除角色权限失败")
+            return this.$message.error("删除角色权限失败");
           }
           // 更新当前部分的角色，不更新全部角色权限
-          role.children=res.data;
-          this.$message.success("删除角色权限成功")
-        }).catch(() => {
+          role.children = res.data;
+          this.$message.success("删除角色权限成功");
+        })
+        .catch(() => {
           this.$message({
-            type: 'info',
-            message: '已取消删除'
-          });          
+            type: "info",
+            message: "已取消删除",
+          });
         });
-         console.log(rightId);
+      console.log(rightId);
+    },
+    //关闭分配权限对话框
+    closeRoleDailog(){
+      this.defaultKey=[];//数组置空不可以为null
+      this.assignRolesVisible=false;
     }
   },
   created() {
