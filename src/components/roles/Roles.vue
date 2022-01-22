@@ -17,19 +17,19 @@
             <!-- 一级权限渲染 -->
             <el-row v-for="(item1, i) in scoped.row.children" :key="item1.id" class="rolerRights" :class="{ bdbottom: true, bdtop: i == 0 }">
               <el-col :span="5">
-                <el-tag type="primary" closable>{{ item1.authName }}</el-tag>
+                <el-tag type="primary" closable  @close="handleClose(scoped.row,item1.id)">{{ item1.authName }}</el-tag>
                 <i class="el-icon-caret-right"></i>
               </el-col>
               <el-col :span="19">
                 <!-- 渲染二级权限 -->
                 <el-row v-for="(item2, i2) in item1.children" :key="item2.id" :class="{ bdtop: true, bdtop: i2 !== 0 }">
                   <el-col :span="6">
-                    <el-tag closable type="success">{{ item2.authName }}</el-tag>
+                    <el-tag closable  @close="handleClose(scoped.row,item2.id)" type="success">{{ item2.authName }}</el-tag>
                     <i class="el-icon-caret-right"></i>
                   </el-col>
                   <!-- 渲染三级权限 -->
                   <el-col :span="18">
-                    <el-tag closable type="warning" v-for="item3 in item2.children" :key="item3.id">{{ item3.authName }}</el-tag>
+                    <el-tag closable type="warning" v-for="item3 in item2.children" :key="item3.id" @close="handleClose(scoped.row,item3.id)">{{ item3.authName }}</el-tag>
                   </el-col>
                 </el-row>
               </el-col>
@@ -216,7 +216,7 @@ export default {
       this.eidtRoledialogFormVisible = true;
       const { data: res } = await this.$http.get(`roles/${id}`);
       if (res.meta.status != 200) {
-        this.$message.error("获取当前角色信息失败");
+       return  this.$message.error("获取当前角色信息失败");
       }
       console.log(res.data);
       this.editRoleForm = res.data;
@@ -226,6 +226,29 @@ export default {
       this.$refs.roleRef.resetFields();
       this.dialogFormVisible = false;
     },
+    //删除权限标签
+    handleClose(role,rightId){
+      this.$confirm('是否删除该权限?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(async () => {
+          // 发请求
+          const {data:res}=await this.$http.delete(`roles/${role.id}/rights/${rightId}`);
+          if (res.meta.status != 200) {
+           return this.$message.error("删除角色权限失败")
+          }
+          // 更新当前部分的角色，不更新全部角色权限
+          role.children=res.data;
+          this.$message.success("删除角色权限成功")
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });          
+        });
+         console.log(rightId);
+    }
   },
   created() {
     this.getRoleList();
