@@ -8,6 +8,7 @@
     <el-card class="categories-card">
       <el-button type="primary" class="categoriesBtn" @click="addDialogVisible">添加分类</el-button>
       <!-- 分类列表 -->
+      <tree-grid></tree-grid>
       <!-- 分页展示 -->
     </el-card>
   </div>

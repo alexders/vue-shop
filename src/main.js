@@ -35,6 +35,11 @@ router.beforeEach((to,from,next)=>{
       next(); //用户已经登录了则放行
     }
 }) 
+
+import ZkTable from 'vue-table-with-tree-grid'
+
+Vue.component("tree-grid", ZkTable)
+
 new Vue({
   router,
   render: h => h(App)
