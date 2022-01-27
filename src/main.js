@@ -38,7 +38,7 @@ router.beforeEach((to,from,next)=>{
 
 import ZkTable from 'vue-table-with-tree-grid'
 
-Vue.component("tree-grid", ZkTable)
+Vue.component("tree-table", {ZkTable})
 
 new Vue({
   router,
