@@ -6,7 +6,7 @@
       <el-breadcrumb-item>商品分类</el-breadcrumb-item>
     </el-breadcrumb>
     <el-card class="categories-card">
-      <el-button type="primary" class="categoriesBtn" @click="addDialogVisible">添加分类</el-button>
+      <el-button type="primary" class="categoriesBtn" @click="showAddDialog">添加分类</el-button>
       <!-- 分类列表 -->
       <tree-table :data="categoriesList" :columns="columns" stripe border show-index :expand-type="false" :selection-type="false" class="categoriesTree">
         <!-- 是否有效 -->
@@ -21,11 +21,19 @@
           <el-tag type="warning" v-else>三级</el-tag>
         </template>
         <!-- 操作 -->
-        <template slot="operate" >
-             <el-button type="primary" icon="el-icon-edit" size="mini" >编辑</el-button>
-             <el-button type="danger" icon="el-icon-delete" size="mini" >删除</el-button>      
+        <template slot="operate">
+          <el-button type="primary" icon="el-icon-edit" size="mini">编辑</el-button>
+          <el-button type="danger" icon="el-icon-delete" size="mini">删除</el-button>
         </template>
       </tree-table>
+      <!-- 添加分类弹出框 -->
+      <el-dialog title="添加分类" :visible.sync="addCatgoriesDailog" close="">
+        <!-- 底部按钮 -->
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="addCatgoriesDailog = false">取 消</el-button>
+          <el-button type="primary">确 定</el-button>
+        </span>
+      </el-dialog>
       <!-- 分页展示 -->
     </el-card>
   </div>
@@ -46,6 +54,7 @@ export default {
         pagenum: 1,
         pagesize: 5,
       },
+      addCatgoriesDailog: false,
     };
   },
   methods: {
@@ -58,6 +67,9 @@ export default {
       }
       console.log(res.data);
       this.categoriesList = res.data.result;
+    },
+    showAddDialog() {
+      this.addCatgoriesDailog = true;
     },
   },
   created() {
