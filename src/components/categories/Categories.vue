@@ -34,6 +34,9 @@
           </el-form-item>
           <el-form-item label="父级分类" prop="cat_pid">
             <el-input v-model="catForm.cat_pid"></el-input>
+            <el-select v-model="catForm.cat_pid">
+              <el-option > </el-option>
+            </el-select>
           </el-form-item>
         </el-form>
         <!-- 底部按钮 -->
@@ -100,7 +103,7 @@ export default {
         return this.$message.error("获取商品信息失败");
       }
       this.categoriesList = res.data.result;
-      this.total=this.categoriesList.length;
+      this.total = this.categoriesList.length;
     },
     showAddDialog() {
       this.addCatgoriesDailog = true;
@@ -112,9 +115,8 @@ export default {
     },
 
     // 分页展示的方法
-    handleSizeChange(){},
-    handleCurrentChange(){},
-
+    handleSizeChange() {},
+    handleCurrentChange() {},
   },
   created() {
     this.getCategories();
