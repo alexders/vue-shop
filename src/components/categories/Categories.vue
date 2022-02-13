@@ -47,7 +47,7 @@
       </el-dialog>
       <!-- 分页展示 -->
       <el-pagination
-        @size-change="handleSizeChange"
+        @size-change="pageSizeChange"
         @current-change="handleCurrentChange"
         :current-page="index.pagenum"
         :page-sizes="[1, 2, 5, 10]"
@@ -72,6 +72,7 @@ export default {
         { label: "操作", type: "template", template: "operate" },
       ],
       index: {
+        type:3,
         pagenum: 1,
         pagesize: 5,
       },
@@ -91,6 +92,7 @@ export default {
           },
         ],
       },
+      total:0,
     };
   },
   methods: {
@@ -103,7 +105,8 @@ export default {
         return this.$message.error("获取商品信息失败");
       }
       this.categoriesList = res.data.result;
-      this.total = this.categoriesList.length;
+     this.total = res.data.total;
+      console.log(res.data.total);
     },
     showAddDialog() {
       this.addCatgoriesDailog = true;
@@ -114,9 +117,16 @@ export default {
       this.addCatgoriesDailog = false;
     },
 
-    // 分页展示的方法
-    handleSizeChange() {},
-    handleCurrentChange() {},
+    // 改变分页大小
+    pageSizeChange(pageSize) {
+      this.index.pagesize=pageSize;
+      this.getCategories();
+    },
+    // 当前页改变
+    handleCurrentChange(pagenum){
+      this.index.pagenum=pagenum;
+      this.getCategories();
+    },
   },
   created() {
     this.getCategories();
