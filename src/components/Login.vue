@@ -8,7 +8,7 @@
       <div class="avatar-box">
         <img src="../assets/imgs/login_logo.png" />
       </div>
-      <div class="title">供应链后台管理系统</div>
+      <div class="title">电商后台管理系统</div>
       <el-form
         ref="loginFormRef"
         class="login_form"
